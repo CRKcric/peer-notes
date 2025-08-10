@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerNotes - Authentication</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background circles */
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899, #f43f5e);
+            opacity: 0.8;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .bg-circle-1 {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            right: 15%;
+            animation-delay: 0s;
+        }
+
+        .bg-circle-2 {
+            width: 200px;
+            height: 200px;
+            bottom: 20%;
+            left: 10%;
+            animation-delay: 2s;
+        }
+
+        .bg-circle-3 {
+            width: 150px;
+            height: 150px;
+            bottom: 10%;
+            right: 60%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        .container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        .left-side {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .hero-text {
+            color: white;
+            font-size: 4rem;
+            font-weight: 800;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .divider {
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.2), transparent);
+            align-self: stretch;
+            margin: 2rem 0;
+        }
+
+        .right-side {
+            width: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .auth-card {
+            background: rgba(30, 30, 30, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            color: #60a5fa;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .auth-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(40, 40, 40, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .auth-link {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .auth-link a {
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        .nav-buttons {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(139, 92, 246, 0.4);
+        }
+
+        .nav-btn.active {
+            background: #8b5cf6;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-side {
+                flex: none;
+                height: 40vh;
+            }
+
+            .hero-text {
+                font-size: 2.5rem;
+            }
+
+            .right-side {
+                width: 100%;
+                flex: 1;
+            }
+
+            .divider {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation buttons for demo -->
+    <div class="nav-buttons">
+        <button class="nav-btn active" onclick="showPage('signup')">Signup</button>
+        <button class="nav-btn" onclick="showPage('forgot')">Forgot Password</button>
+    </div>
+
+    <!-- Signup Page -->
+    <div class="page active" id="signup-page">
+        <!-- Animated background -->
+        <div class="bg-circle bg-circle-1"></div>
+        <div class="bg-circle bg-circle-2"></div>
+        <div class="bg-circle bg-circle-3"></div>
+
+        <div class="container">
+            <div class="left-side">
+                <h1 class="hero-text">Let's get you in!</h1>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="right-side">
+                <div class="auth-card">
+                    <div class="logo">
+                        <img src="logo.png" alt="Peer Notes Logo" class="logo-image" style="height:40px;width:auto;border-radius:8px;">
+                        <span class="logo-text">Peer Notes</span>
+                    </div>
+
+                    <h2 class="auth-title">Signup</h2>
+                    <p class="auth-subtitle">Just some details to get you in.!</p>
+
+                    <form id="signupForm">
+                        <div class="form-group">
+                            <input type="text" class="form-input" placeholder="Username" required>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="text" class="form-input" placeholder="Admn No" required>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="email" class="form-input" placeholder="Email / Phone" required>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="password" class="form-input" placeholder="Password" required>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="password" class="form-input" placeholder="Confirm Password" required>
+                        </div>
+
+                        <button type="submit" class="submit-btn">Signup</button>
+                    </form>
+
+                    <p class="auth-link">Already Registered? <a href="login.html" onclick="showPage('login')">Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Page -->
+    <div class="page" id="forgot-page">
+        <!-- Animated background -->
+        <div class="bg-circle bg-circle-1"></div>
+        <div class="bg-circle bg-circle-2"></div>
+        <div class="bg-circle bg-circle-3"></div>
+
+        <div class="container">
+            <div class="left-side">
+                <h1 class="hero-text">No big deal!</h1>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="right-side">
+                <div class="auth-card">
+                    <div class="logo">
+                        <img src="logo.png" alt="Peer Notes Logo" class="logo-image" style="height:40px;width:auto;border-radius:8px;">
+                        <span class="logo-text">Peer Notes</span>
+                    </div>
+
+                    <h2 class="auth-title">Forgot Password ?</h2>
+                    <p class="auth-subtitle">Please enter you're email or your mobile number</p>
+
+                    <form id="forgotForm">
+                        <div class="form-group">
+                            <input type="email" class="form-input" placeholder="example@mail.com" required>
+                        </div>
+
+                        <button type="submit" class="submit-btn">Reset Password</button>
+                    </form>
+
+                    <p class="auth-link">Don't have an account ? <a href="auth-pages.html" onclick="showPage('signup')">Signup</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showPage(pageType) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+
+            // Show selected page
+            const targetPage = document.getElementById(pageType + '-page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Update nav buttons
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            
+            const activeBtn = [...navButtons].find(btn => 
+                btn.textContent.toLowerCase().includes(pageType === 'forgot' ? 'forgot' : 'signup')
+            );
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
+        // Show forgot page if URL hash is #forgot
+        if (window.location.hash === '#forgot') {
+            showPage('forgot');
+        }
+
+        // Form handling
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Signup form submitted! (This is just a demo)');
+        });
+
+        document.getElementById('forgotForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Password reset email sent! (This is just a demo)');
+        });
+
+        // Add some interactive animations
+        document.addEventListener('mousemove', function(e) {
+            const circles = document.querySelectorAll('.bg-circle');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            circles.forEach((circle, index) => {
+                const speed = (index + 1) * 0.5;
+                const xOffset = (x - 0.5) * speed;
+                const yOffset = (y - 0.5) * speed;
+                circle.style.transform += ` translate(${xOffset}px, ${yOffset}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
