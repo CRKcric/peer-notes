@@ -491,21 +491,7 @@
             overlay.classList.remove('active');
         }
 
-        // Search form handling - redirect to results page
-        document.getElementById('searchForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            const formData = new FormData(this);
-            const searchParams = new URLSearchParams();
-            
-            for (let [key, value] of formData.entries()) {
-                searchParams.append(key, value);
-            }
-            
-            // Redirect to results page with search parameters
-            window.location.href = `results.html?${searchParams.toString()}`;
-        });
+       
 
         // Interactive background animation
         document.addEventListener('mousemove', function(e) {
@@ -521,7 +507,7 @@
                 circle.style.transform += ` translate(${xOffset}px, ${yOffset}px)`;
             });
         });
-
+        //test change
         // Add hover effects
         document.querySelectorAll('.confirm-btn').forEach(btn => {
             btn.addEventListener('mouseenter', function() {
